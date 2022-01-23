@@ -4,51 +4,13 @@ import Date from "../components/date";
 import Layout, { siteTitle } from "../components/layout";
 import utilStyles from "../styles/utils.module.css";
 import { getSortedPostsData } from "../lib/posts";
+import { GetStaticProps } from "next";
 
-// NOTES: different ways of rendering an app
-//
-// - to use SSG you need to export 'getServerSideProps' func from a page
-//
-// - to use Static Generation you need to export 'getStaticProps' from a page
-//
-// - or, clientside rendering: you can make client do all the rendering by
-// fetching data from within then client app.
-// using something like swr, react-query etc.
-
-// NOTES: about Server-Side Rendering (SSG)
-//
-// for pre-rendering a SSG page on every request,
-// we need todo all data fetching/population work in the
-// function 'getServerSideProps'.
-//
-// - this function can only be exported from a page
-//
-// - it is called with a 'context' parameter which contains
-// request specific params
-
-// runs at build time (in production)
-//
-// important points:
-//
-// - because it is meant to be run at build time, in 'getStaticProps',
-// you *cannot* use data that is only avail during request time (things like
-// query params, http headers)
-//
-// - getStaticProps can only be exported from a *page*. that is because
-// react needs to have all required data before the page is rendered
-export async function getStaticProps() {
-  const allPostsData = getSortedPostsData();
-
-  // by returning this stuff inside props object, the blog
-  // posts will be passed to the Home component as a prop
-  return {
-    props: {
-      allPostsData,
-    },
-  };
-}
-
-export default function Home({ allPostsData }) {
+export default function Home({
+  allPostsData,
+}: {
+  allPostsData: Array<{ id: string; date: string; title: string }>;
+}) {
   return (
     <Layout home>
       <Head>
@@ -81,3 +43,46 @@ export default function Home({ allPostsData }) {
     </Layout>
   );
 }
+
+// NOTES: different ways of rendering an app
+//
+// - to use SSG you need to export 'getServerSideProps' func from a page
+//
+// - to use Static Generation you need to export 'getStaticProps' from a page
+//
+// - or, clientside rendering: you can make client do all the rendering by
+// fetching data from within then client app.
+// using something like swr, react-query etc.
+
+// NOTES: about Server-Side Rendering (SSG)
+//
+// for pre-rendering a SSG page on every request,
+// we need todo all data fetching/population work in the
+// function 'getServerSideProps'.
+//
+// - this function can only be exported from a page
+//
+// - it is called with a 'context' parameter which contains
+// request specific params
+
+// runs at build time (in production)
+//
+// important points:
+//
+// - because it is meant to be run at build time, in 'getStaticProps',
+// you *cannot* use data that is only avail during request time (things like
+// query params, http headers)
+//
+// - getStaticProps can only be exported from a *page*. that is because
+// react needs to have all required data before the page is rendered
+export const getStaticProps: GetStaticProps = async () => {
+  const allPostsData = getSortedPostsData();
+
+  // by returning this stuff inside props object, the blog
+  // posts will be passed to the Home component as a prop
+  return {
+    props: {
+      allPostsData,
+    },
+  };
+};
